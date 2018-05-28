@@ -1,6 +1,6 @@
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.util.HashMap;
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -22,7 +22,8 @@ import javax.servlet.http.HttpServletResponse;
 public class BillBoardServlet extends HttpServlet {
 	//private final BillBoardHtmlAdapter bb = new BillBoardHtmlAdapter ("BillBoardServlet");
 	private final BillBoardJSONAdapter bb = new BillBoardJSONAdapter("BillBoardServlet");
-	private ArrayList<AsyncContext> events = new ArrayList<>();
+	private HashMap<String, AsyncContext> events = new HashMap<>();
+	private static int eventId = 0;
 	
 	// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
 	/**
@@ -41,13 +42,18 @@ public class BillBoardServlet extends HttpServlet {
 		System.out.println("BillBoardServer - GET (" + caller_ip + "): full output");
 		//response.setContentType("text/html;charset=UTF-8");
 		response.setContentType("text/event-stream");
+		response.setCharacterEncoding("UTF-8");
 		
 		//to clear threads and allow for asynchronous execution
 		final AsyncContext asyncContext = request.startAsync(request, response);
 		asyncContext.setTimeout(0);
 		
 		//add context to list for later use
-		events.add(asyncContext);
+		if(!events.containsKey(caller_ip)){
+			events.put(caller_ip, asyncContext);
+			sendUpdates();
+		}
+		
 		System.out.println("Registered async event source");
 	}
 	
@@ -64,6 +70,13 @@ public class BillBoardServlet extends HttpServlet {
 			throws ServletException, IOException {
 		String caller_ip = request.getRemoteAddr();
 		System.out.println ("BillBoardServer - POST (" + caller_ip + ")");
+		
+		try{
+			bb.createEntry(request.getParameter("message"), caller_ip);
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+		
 		// TODO implementation of doPost()!
 		response.getWriter().close();
 		sendUpdates();
@@ -80,7 +93,15 @@ public class BillBoardServlet extends HttpServlet {
 	@Override
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		String caller_ip = request.getRemoteAddr();
+		System.out.println ("BillBoardServer - POST (" + caller_ip + ")");
+		try{
+			bb.deleteEntry(Integer.parseInt(request.getParameter("idx")));
+		} catch(Exception e){
+			e.printStackTrace();
+		}
 		// TODO implementation of doDelete()!
+		response.getWriter().close();
 		sendUpdates();
 	}
 	
@@ -96,7 +117,15 @@ public class BillBoardServlet extends HttpServlet {
 	protected void doPut(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String caller_ip = request.getRemoteAddr();
+		System.out.println ("BillBoardServer - POST (" + caller_ip + ")");
+		try {
+			bb.updateEntry(Integer.parseInt(request.getParameter("idx")), request.getParameter("message"), caller_ip);
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+		
 		// TODO implementation of doPut()!
+		response.getWriter().close();
 		sendUpdates();
 	}
 	
@@ -112,17 +141,20 @@ public class BillBoardServlet extends HttpServlet {
 	
 	private void sendUpdates(){
 		System.out.println("Sending updates");
-		for(AsyncContext context: events){
-			PrintWriter out;
+		for(AsyncContext context: events.values()){
+			PrintWriter writer;
 			try {
-				out = context.getResponse().getWriter();
+				writer = context.getResponse().getWriter();
 				String table = bb.readEntries(context.getRequest().getRemoteAddr());
-				System.out.println("BLA"+table);
-				try {
-					out.println(table);
-				} finally {
-					out.close();
-				}
+				System.out.println("Content: "+table);
+				
+				writer.print("id: ");
+				writer.println(eventId++);
+				writer.print("data: ");
+				writer.println(table);
+				writer.println();
+				writer.println(table);
+				writer.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

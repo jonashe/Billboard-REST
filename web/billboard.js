@@ -55,29 +55,43 @@ function getHtmlHttpRequest(url) {
 function getxyzHttpRequest(context, data) {
     var output = '<table border="1" rules="none" cellspacing="4" cellpadding="5">';
     data.forEach(function(plakat){
+        console.log(plakat);
         output += '<tr><td>'+plakat.id+'</td><td><input type="text" size="100" minlength="100" maxlength="100" ' +
-            'id="input_field_'+plakat.id+'" "value="'+plakat.text+'" '+((!plakat.disable_edits) ? 'disabled' : '')+'></td><td>';
+            'id="input_field_'+plakat.id+'" value="'+plakat.text+'" '+((plakat.disable_edits) ? 'disabled' : '')+'></td><td>';
         if(!plakat.disable_edits){
-            output += '<button onClick="putHttpRequest('+context+','+data.id+')">Update</button>';
+            output += '<button onClick="putHttpRequest(\''+context+'\','+plakat.id+')">Update</button>';
         }
         output += '</td><td>';
         if(!plakat.disable_edits){
-            output += '<button onClick="deleteHttpRequest('+context+','+data.id+')">Delete</button>';
+            output += '<button onClick="deleteHttpRequest(\''+context+'\','+plakat.id+')">Delete</button>';
         }
         output += '</td></tr>';
     });
     output += '</table>';
     $('posters').innerHTML = output;
+
 }
 
 function postHttpRequest(url) {
+    var xhttp = getXMLHttpRequest();
+    var message = $('contents').value;
+    xhttp.open("POST", url, true);
+    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhttp.send("message="+message);
     // TO BE IMPLEMENTED!!!
 }
 
 function putHttpRequest(url, id) {
+    var xhttp = getXMLHttpRequest();
+    var message = $('input_field_'+id).value;
+    xhttp.open("PUT", url+"?idx="+id+"&message="+message, true);
+    xhttp.send(null);
     // TO BE IMPLEMENTED!!!
 }
 
 function deleteHttpRequest(url, id) {
+    var xhttp = getXMLHttpRequest();
+    xhttp.open("DELETE", url+"?idx="+id, true);
+    xhttp.send(null);
     // TO BE IMPLEMENTED!!!
 }

@@ -10,7 +10,12 @@ public class BillBoardJSONAdapter extends BillBoard implements BillBoardAdapterI
 	public String readEntries(String caller_ip) {
 		JSONArray entries = new JSONArray();
 		for(BillBoardEntry e: billboard){
-			entries.put(readEntry(e.id, caller_ip));
+			JSONObject entry = new JSONObject();
+			entry.put("id", e.id);
+			entry.put("disable_edits", !e.belongsToCaller(caller_ip));
+			entry.put("text", e.text);
+			
+			entries.put(entry);
 		}
 		
 		return entries.toString();

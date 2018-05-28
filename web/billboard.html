@@ -21,13 +21,13 @@
 <div id="timestamp" style="font-family:arial;font-size:10pt;">
 </div>
 <script type="text/javascript">
-	var context = "BillBoardServlet";
+	var context = "BillBoardServer";
     if(typeof(EventSource) !== "undefined") {
         source = new EventSource("BillBoardServer");
         source.onmessage = function(event) {
-            getxyzHttpRequest(context, event.data);
+            getxyzHttpRequest(context, JSON.parse(event.data));
             $('timestamp').innerHTML = new Date().toString();
-        }
+        };
     } else {
         window.setInterval(function() {
             getHtmlHttpRequest('BillBoardServer');

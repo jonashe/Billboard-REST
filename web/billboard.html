@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width">
 	<script type="text/javascript" src="billboard.js"></script>
 	<script>
-        setGetMethod(0); /* html einstellen */
+        setGetMethod(1); /* html einstellen */
 	</script>
 </head>
 <body style="font-family:arial;">
@@ -21,10 +21,19 @@
 <div id="timestamp" style="font-family:arial;font-size:10pt;">
 </div>
 <script type="text/javascript">
-    window.setInterval(function() {
-        getHtmlHttpRequest('BillBoardServer');
-        $('timestamp').innerHTML = new Date().toString();
-    }, 10000);
+	var context = "BillBoardServlet";
+    if(typeof(EventSource) !== "undefined") {
+        source = new EventSource("BillBoardServer");
+        source.onmessage = function(event) {
+            getxyzHttpRequest(context, event.data);
+            $('timestamp').innerHTML = new Date().toString();
+        }
+    } else {
+        window.setInterval(function() {
+            getHtmlHttpRequest('BillBoardServer');
+            $('timestamp').innerHTML = new Date().toString();
+        }, 10000);
+    }
 </script>
 </body>
 </html>

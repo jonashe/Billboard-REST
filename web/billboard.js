@@ -52,8 +52,22 @@ function getHtmlHttpRequest(url) {
     xmlhttp.send(null);
 }
 
-function getxyzHttpRequest(url) {
-    // TO BE IMPLEMENTED!!!
+function getxyzHttpRequest(context, data) {
+    var output = '<table border="1" rules="none" cellspacing="4" cellpadding="5">';
+    data.forEach(function(plakat){
+        output += '<tr><td>'+plakat.id+'</td><td><input type="text" size="100" minlength="100" maxlength="100" ' +
+            'id="input_field_'+plakat.id+'" "value="'+plakat.text+'" '+((!plakat.disable_edits) ? 'disabled' : '')+'></td><td>';
+        if(!plakat.disable_edits){
+            output += '<button onClick="putHttpRequest('+context+','+data.id+')">Update</button>';
+        }
+        output += '</td><td>';
+        if(!plakat.disable_edits){
+            output += '<button onClick="deleteHttpRequest('+context+','+data.id+')">Delete</button>';
+        }
+        output += '</td></tr>';
+    });
+    output += '</table>';
+    $('posters').innerHTML = output;
 }
 
 function postHttpRequest(url) {

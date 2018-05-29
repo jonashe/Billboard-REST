@@ -58,13 +58,9 @@ function getxyzHttpRequest(context, data) {
         console.log(plakat);
         output += '<tr><td>'+plakat.id+'</td><td><input type="text" size="100" minlength="100" maxlength="100" ' +
             'id="input_field_'+plakat.id+'" value="'+plakat.text+'" '+((plakat.disable_edits) ? 'disabled' : '')+'></td><td>';
-        if(!plakat.disable_edits){
-            output += '<button onClick="putHttpRequest(\''+context+'\','+plakat.id+')">Update</button>';
-        }
+        output += '<button onClick="putHttpRequest(\''+context+'\','+plakat.id+')" '+((plakat.disable_edits) ?  'disabled' : '')+'>Update</button>';
         output += '</td><td>';
-        if(!plakat.disable_edits){
-            output += '<button onClick="deleteHttpRequest(\''+context+'\','+plakat.id+')">Delete</button>';
-        }
+        output += '<button onClick="deleteHttpRequest(\''+context+'\','+plakat.id+')" '+((plakat.disable_edits) ? 'disabled' : '')+'>Delete</button>';
         output += '</td></tr>';
     });
     output += '</table>';

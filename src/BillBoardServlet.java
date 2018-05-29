@@ -94,7 +94,7 @@ public class BillBoardServlet extends HttpServlet {
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String caller_ip = request.getRemoteAddr();
-		System.out.println ("BillBoardServer - POST (" + caller_ip + ")");
+		System.out.println ("BillBoardServer - DELETE (" + caller_ip + ")");
 		try{
 			bb.deleteEntry(Integer.parseInt(request.getParameter("idx")));
 		} catch(Exception e){
@@ -117,7 +117,7 @@ public class BillBoardServlet extends HttpServlet {
 	protected void doPut(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String caller_ip = request.getRemoteAddr();
-		System.out.println ("BillBoardServer - POST (" + caller_ip + ")");
+		System.out.println ("BillBoardServer - PUT (" + caller_ip + ")");
 		try {
 			bb.updateEntry(Integer.parseInt(request.getParameter("idx")), request.getParameter("message"), caller_ip);
 		} catch(Exception e){

@@ -49,10 +49,8 @@ public class BillBoardServlet extends HttpServlet {
 		asyncContext.setTimeout(0);
 		
 		//add context to list for later use
-		if(!events.containsKey(caller_ip)){
-			events.put(caller_ip, asyncContext);
-			sendUpdates();
-		}
+		events.put(caller_ip, asyncContext);
+		sendUpdates();
 		
 		System.out.println("Registered async event source");
 	}
